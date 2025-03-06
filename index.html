@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>La Légende de la Lumière - Une Aventure Légendaire</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <div id="start-screen">
+            <h1>Redzix</h1>
+            <p>Aidez le heros "zix" dans sa quete pour recuperer les cristaux de puissance et sauver le royaume de la lumiere</p>
+            <button id="start-button">Commencer l'Aventure</button>
+            <div class="instructions">
+                <h3>Instructions du Jeu:</h3>
+                <div class="controls-info">
+                    <p>Appuyez sur les boutons de controle pour vous deplacer, collecter les cristaux et vaincre les ennemis</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="game-world" style="display: none;">
+            <!-- Les éléments seront créés par JavaScript -->
+            <div id="hero"></div>
+        </div>
+
+        <div id="level-complete" style="display: none;">
+            <h2>Bravo!</h2>
+            <p>Vous avez terminé le niveau avec succès</p>
+            <div id="level-stats">
+                <p>Cristaux Collectés: <span id="crystals-collected">0</span></p>
+                <p>Ennemis Vaincus: <span id="enemies-defeated">0</span></p>
+                <p>Temps: <span id="time-spent">0</span> secondes</p>
+            </div>
+            <button id="next-level-button">Niveau Suivant</button>
+        </div>
+
+        <div id="game-over" style="display: none;">
+            <h2>Fin du Jeu</h2>
+            <p>Vous avez perdu toutes vos tentatives</p>
+            <button id="retry-button">Réessayer</button>
+        </div>
+
+        <div id="controls">
+            <div id="d-pad">
+                <button id="up-button" class="control-button">?</button>
+                <div class="horizontal-buttons">
+                    <button id="left-button" class="control-button">?</button>
+                    <button id="right-button" class="control-button">?</button>
+                </div>
+            </div>
+            <div id="action-buttons">
+                <button id="jump-button" class="control-button">Sauter</button>
+                <button id="attack-button" class="control-button">Attaquer</button>
+            </div>
+        </div>
+
+        <div id="game-ui">
+            <div id="health-bar">
+                <div id="health-fill"></div>
+            </div>
+            <div id="crystal-counter">0</div>
+            <div id="level-indicator">Niveau: 1</div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
