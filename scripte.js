@@ -1,202 +1,478 @@
-// ==================== ??????? ???? ====================
+// ??????? ????????
 const gameContainer = document.getElementById('game-container');
-const gameWorld = document.getElementById('game-world');
-const hero = document.getElementById('hero');
-const startScreen = document.getElementById('start-screen');
-const levelCompleteScreen = document.getElementById('level-complete');
+const dino = document.getElementById('dino');
+const obstaclesContainer = document.getElementById('obstacles');
+const particles = document.getElementById('particles');
+const scoreDisplay = document.getElementById('score');
+const highScoreDisplay = document.getElementById('high-score');
 const gameOverScreen = document.getElementById('game-over');
-const startButton = document.getElementById('start-button');
-const nextLevelButton = document.getElementById('next-level-button');
-const retryButton = document.getElementById('retry-button');
-const healthFill = document.getElementById('health-fill');
-const crystalCounter = document.getElementById('crystal-counter');
-const levelIndicator = document.getElementById('level-indicator');
-const crystalsCollectedStat = document.getElementById('crystals-collected');
-const enemiesDefeatedStat = document.getElementById('enemies-defeated');
-const timeSpentStat = document.getElementById('time-spent');
-
-// ????? ??????
-const upButton = document.getElementById('up-button');
-const leftButton = document.getElementById('left-button');
-const rightButton = document.getElementById('right-button');
-const jumpButton = document.getElementById('jump-button');
-const attackButton = document.getElementById('attack-button');
+const finalScoreDisplay = document.getElementById('final-score');
+const restartBtn = document.getElementById('restart-btn');
+const jumpBtn = document.getElementById('jump-btn');
+const duckBtn = document.getElementById('duck-btn');
+const jumpSound = document.getElementById('jump-sound');
+const hitSound = document.getElementById('hit-sound');
+const pointSound = document.getElementById('point-sound');
 
 // ??????? ??????
-const gravity = 0.6;
-const friction = 0.8;
-const heroSpeed = 5;
-const jumpStrength = 15;
-const viewportWidth = window.innerWidth;
-const viewportHeight = window.innerHeight;
+let isGameStarted = false;
+let isGameOver = false;
+let score = 0;
+let highScore = localStorage.getItem('dinoHighScore') || 0;
+let animationFrameId;
+let obstacleGenerationInterval;
+let scoreInterval;
+let isJumping = false;
+let isDucking = false;
+let gameSpeed = 5;
+let obstacles = [];
+let lastTime = 0;
+let spawnTime = 0;
+let particleTime = 0;
 
-// ???? ??????
-let gameActive = false;
-let currentLevel = 1;
-let crystalsCollected = 0;
-let enemiesDefeated = 0;
-let gameStartTime = 0;
-let levelData = {};
-let platforms = [];
-let enemies = [];
-let crystals = [];
-let artifacts = [];
-let decorations = [];
-let boss = null;
+// ????? ?????? ?????
+window.addEventListener('load', function() {
+    // ??? ???? ?????
+    highScoreDisplay.textContent = `???? ?????: ${highScore}`;
+    gameContainer.classList.add('intro-animation');
+    
+    // ??? ?????? ?????
+    setTimeout(() => {
+        startGame();
+    }, 500);
+});
 
-// ???? ?????
-let heroState = {
-    x: 100,
-    y: 300,
-    width: 60,
-    height: 80,
-    velX: 0,
-    velY: 0,
-    jumping: false,
-    grounded: false,
-    facingRight: true,
-    attacking: false,
-    health: 100,
-    maxHealth: 100,
-    attackDamage: 25,
-    attackCooldown: false,
-    hitCooldown: false,
-    dead: false
-};
+// ????? ?????? ????? ????????
+document.addEventListener('keydown', function(event) {
+    // ????? ?????? ??????? ?? ????? ??????
+    if ((event.code === 'Space' || event.code === 'ArrowUp') && !isJumping && !isDucking) {
+        jump();
+    }
+    
+    // ???????? ?????? ??????
+    if (event.code === 'ArrowDown' && !isJumping) {
+        duck();
+    }
+    
+    // ????? ????? ?????? ???????? ??? ?????? ??????
+    if (event.code === 'Space' && isGameOver) {
+        startGame();
+    }
+});
 
-// ==================== ????? ??????? ====================
-function init() {
-    // ????? ?????? ????? ???????
-    startButton.addEventListener('click', startGame);
-    nextLevelButton.addEventListener('click', loadNextLevel);
-    retryButton.addEventListener('click', restartGame);
-    
-    // ????? ????? ?????? ????
-    setupTouchControls();
-    
-    // ????? ?????? ????? ????????
-    setupKeyboardControls();
-    
-    // ????? ??????? ??????
-    initLevelData();
-    
-    // ??? ???? ??????
-    requestAnimationFrame(gameLoop);
-}
+document.addEventListener('keyup', function(event) {
+    // ????? ???????? ??? ??? ?? ????? ??????
+    if (event.code === 'ArrowDown') {
+        endDuck();
+    }
+});
 
-function setupTouchControls() {
-    // ????? ??? ???????
-    jumpButton.addEventListener('touchstart', function(e) {
-        e.preventDefault();
-        if (!heroState.jumping && heroState.grounded) {
-            heroState.velY = -jumpStrength;
-            heroState.jumping = true;
-            heroState.grounded = false;
-            playSound('jump');
-            addClass(hero, 'jump');
-            setTimeout(() => removeClass(hero, 'jump'), 600);
-        }
-    });
-    
-    attackButton.addEventListener('touchstart', function(e) {
-        e.preventDefault();
-        if (!heroState.attackCooldown) {
-            attack();
-        }
-    });
-    
-    // ??? ?????? ??????? ??? ?????
-    leftButton.addEventListener('touchstart', function(e) {
-        e.preventDefault();
-        heroState.velX = -heroSpeed;
-        heroState.facingRight = false;
-        addClass(hero, 'flip');
-    });
-    
-    rightButton.addEventListener('touchstart', function(e) {
-        e.preventDefault();
-        heroState.velX = heroSpeed;
-        heroState.facingRight = true;
-        removeClass(hero, 'flip');
-    });
-    
-    // ????? ?????? ??????? ??? ???????
-    leftButton.addEventListener('touchend', function(e) {
-        e.preventDefault();
-        if (heroState.velX < 0) {
-            heroState.velX = 0;
-        }
-    });
-    
-    rightButton.addEventListener('touchend', function(e) {
-        e.preventDefault();
-        if (heroState.velX > 0) {
-            heroState.velX = 0;
-        }
-    });
-}
+// ????? ????? ??????? ???????
+jumpBtn.addEventListener('touchstart', jump);
+jumpBtn.addEventListener('mousedown', jump);
 
-function setupKeyboardControls() {
-    // ????? ?????? ????????
-    window.addEventListener('keydown', function(e) {
-        if (!gameActive) return;
+duckBtn.addEventListener('touchstart', duck);
+duckBtn.addEventListener('mousedown', duck);
+duckBtn.addEventListener('touchend', endDuck);
+duckBtn.addEventListener('mouseup', endDuck);
+
+// ?? ????? ?????
+restartBtn.addEventListener('click', startGame);
+
+// ????? ??? ??????
+function startGame() {
+    if (isGameStarted) return;
+    
+    isGameStarted = true;
+    isGameOver = false;
+    score = 0;
+    gameSpeed = 5;
+    obstacles = [];
+    
+    // ????? ???? ??????? ????????
+    while (obstaclesContainer.firstChild) {
+        obstaclesContainer.removeChild(obstaclesContainer.firstChild);
+    }
+    
+    // ????? ???? ?????? ?????? ??? ???? ?????
+    gameOverScreen.classList.remove('visible');
+    
+    // ????? ????? ???? ?????????
+    dino.classList.remove('hit', 'jumping', 'ducking');
+    
+    // ????? ??????? ?? 100 ???? ?????
+    scoreInterval = setInterval(() => {
+        score++;
+        scoreDisplay.textContent = score;
         
-        switch(e.key) {
-            case 'ArrowUp':
-            case 'w':
-            case ' ':
-                if (!heroState.jumping && heroState.grounded) {
-                    heroState.velY = -jumpStrength;
-                    heroState.jumping = true;
-                    heroState.grounded = false;
-                    playSound('jump');
-                    addClass(hero, 'jump');
-                    setTimeout(() => removeClass(hero, 'jump'), 600);
-                }
-                break;
-            case 'ArrowLeft':
-            case 'a':
-                heroState.velX = -heroSpeed;
-                heroState.facingRight = false;
-                addClass(hero, 'flip');
-                break;
-            case 'ArrowRight':
-            case 'd':
-                heroState.velX = heroSpeed;
-                heroState.facingRight = true;
-                removeClass(hero, 'flip');
-                break;
-            case 'f':
-            case 'z':
-            case 'Control':
-                if (!heroState.attackCooldown) {
-                    attack();
-                }
-                break;
+        // ????? ???? ?????? ????????
+        if (score % 100 === 0) {
+            gameSpeed += 0.5;
+            createScoreParticles();
+            playSound(pointSound);
         }
+    }, 100);
+    
+    // ????? ??? ????? ?????????
+    dino.classList.add('running');
+    
+    // ????? ???????
+    obstacleGenerationInterval = setInterval(createObstacle, getRandomTime(1500, 3000));
+    
+    // ??? ???? ?????? ???????? ????????
+    lastTime = performance.now();
+    animationFrameId = requestAnimationFrame(gameLoop);
+}
+
+// ?????? ??? ??? ??????
+function getRandomTime(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+// ???? ?????? ????????
+function gameLoop(currentTime) {
+    if (isGameOver) return;
+    
+    const deltaTime = currentTime - lastTime;
+    lastTime = currentTime;
+    
+    // ????? ???????
+    updateObstacles(deltaTime);
+    
+    // ????? ??????
+    particleTime += deltaTime;
+    if (particleTime > 100) {
+        createParticles();
+        particleTime = 0;
+    }
+    
+    // ??? ????????
+    detectCollision();
+    
+    // ??????? ??????
+    animationFrameId = requestAnimationFrame(gameLoop);
+}
+
+// ????? ????
+function createObstacle() {
+    // ??? ????? ??????? ??? ?????? ??????
+    if (isGameOver) return;
+    
+    // ????? ??? ??????: ???? ?? ???? ?? ????
+    const randomValue = Math.random();
+    let type;
+    
+    if (randomValue < 0.3) {
+        type = 'bird';
+    } else if (randomValue < 0.7) {
+        type = 'cactus';
+    } else {
+        type = 'barrier';
+    }
+    
+    const obstacle = document.createElement('div');
+    
+    if (type === 'cactus') {
+        obstacle.className = 'cactus';
+        // ??? ?????? ??????
+        const height = 40 + Math.random() * 30;
+        obstacle.style.height = height + 'px';
+        obstacle.style.bottom = '70px';
+    } else if (type === 'bird') {
+        obstacle.className = 'bird';
+        // ?????? ?????? ??????
+        const height = 90 + Math.random() * 60;
+        obstacle.style.bottom = height + 'px';
+    } else if (type === 'barrier') {
+        obstacle.className = 'barrier';
+        obstacle.style.height = '40px';
+        obstacle.style.bottom = '70px';
+    }
+    
+    // ??? ?????? ???? ??????
+    obstacle.style.left = gameContainer.offsetWidth + 'px';
+    
+    // ????? ?????? ??? DOM
+    obstaclesContainer.appendChild(obstacle);
+    
+    // ????? ?????? ??? ?????? ???????
+    obstacles.push({
+        element: obstacle,
+        type: type,
+        x: gameContainer.offsetWidth,
+        width: type === 'bird' ? 40 : (type === 'barrier' ? 30 : 25)
     });
     
-    // ????? ?????? ????????
-    window.addEventListener('keyup', function(e) {
-        if (!gameActive) return;
+    // ????? ?????? ?????? ???? ??????
+    if (obstacleGenerationInterval) {
+        clearInterval(obstacleGenerationInterval);
+    }
+    obstacleGenerationInterval = setTimeout(createObstacle, getRandomTime(1200, 3000 - (gameSpeed * 100)));
+}
+
+// ????? ????? ???????
+function updateObstacles(deltaTime) {
+    for (let i = 0; i < obstacles.length; i++) {
+        // ????? ??????
+        obstacles[i].x -= gameSpeed * (deltaTime / 16);
+        obstacles[i].element.style.left = obstacles[i].x + 'px';
         
-        switch(e.key) {
-            case 'ArrowLeft':
-            case 'a':
-                if (heroState.velX < 0) {
-                    heroState.velX = 0;
-                }
-                break;
-            case 'ArrowRight':
-            case 'd':
-                if (heroState.velX > 0) {
-                    heroState.velX = 0;
-                }
-                break;
+        // ????? ??????? ???? ??????
+        if (obstacles[i].x < -obstacles[i].width) {
+            obstacles[i].element.remove();
+            obstacles.splice(i, 1);
+            i--;
         }
+    }
+}
+
+// ??? ????????
+function detectCollision() {
+    const dinoRect = dino.getBoundingClientRect();
+    
+    for (let i = 0; i < obstacles.length; i++) {
+        const obstacleRect = obstacles[i].element.getBoundingClientRect();
+        
+        // ????? ????? ???????? ????? ??? ??? ?????????
+        let dinoHitboxTop = dinoRect.top;
+        let dinoHitboxBottom = dinoRect.bottom;
+        let dinoHitboxLeft = dinoRect.left + 10;
+        let dinoHitboxRight = dinoRect.right - 10;
+        
+        // ????? ????? ???????? ??? ????????
+        if (isDucking) {
+            dinoHitboxTop = dinoRect.top + 20; // ????? ????? ???????? ?????? ??? ????????
+        }
+        
+        // ?????? ?? ??????? ?? ????? ???????
+        if (
+            dinoHitboxRight > obstacleRect.left + 10 && 
+            dinoHitboxLeft < obstacleRect.right - 10 && 
+            dinoHitboxBottom > obstacleRect.top + 5 && 
+            dinoHitboxTop < obstacleRect.bottom - 5
+        ) {
+            // ??????? ????? ???????? ??? ??? ????????? ??????? ??????? ?????
+            if (obstacles[i].type === 'bird' && isDucking && obstacleRect.bottom < dinoRect.top + 30) {
+                continue;
+            }
+            
+            gameOver();
+            break;
+        }
+    }
+}
+
+// ?????? ??????
+function gameOver() {
+    isGameOver = true;
+    isGameStarted = false;
+    
+    // ????? ??????? ???????
+    clearInterval(scoreInterval);
+    clearInterval(obstacleGenerationInterval);
+    cancelAnimationFrame(animationFrameId);
+    
+    // ????? ?????????
+    dino.classList.remove('running', 'jumping', 'ducking');
+    dino.classList.add('hit');
+    
+    // ????? ??? ????????
+    playSound(hitSound);
+    
+    // ????? ???? ?????
+    if (score > highScore) {
+        highScore = score;
+        localStorage.setItem('dinoHighScore', highScore);
+        highScoreDisplay.textContent = `???? ?????: ${highScore}`;
+    }
+    
+    // ??? ???? ?????? ??????
+    finalScoreDisplay.textContent = score;
+    setTimeout(() => {
+        gameOverScreen.classList.add('visible');
+    }, 1000);
+}
+
+// ????? ?????
+function jump() {
+    if (isGameOver || isJumping || isDucking) return;
+    
+    isJumping = true;
+    dino.classList.remove('running');
+    dino.classList.add('jumping');
+    
+    // ????? ??? ?????
+    playSound(jumpSound);
+    
+    // ????? ?????? ?????
+    createJumpParticles();
+    
+    // ????? ????? ????????? ??? ?????
+    setTimeout(() => {
+        dino.classList.remove('jumping');
+        if (!isGameOver && !isDucking) {
+            dino.classList.add('running');
+        }
+        isJumping = false;
+    }, 500);
+}
+
+// ????? ????????
+function duck() {
+    if (isGameOver || isJumping) return;
+    
+    if (!isDucking) {
+        isDucking = true;
+        dino.classList.remove('running');
+        dino.classList.add('ducking');
+    }
+}
+
+// ????? ????????
+function endDuck() {
+    if (isDucking) {
+        isDucking = false;
+        dino.classList.remove('ducking');
+        if (!isGameOver && !isJumping) {
+            dino.classList.add('running');
+        }
+    }
+}
+
+// ????? ?????
+function playSound(sound) {
+    sound.currentTime = 0;
+    sound.play().catch(err => {
+        // ????? ????? ????? ????? (?? ???? ?? ????????? ???? ?????? ???????)
+        console.log('Could not play sound:', err);
     });
 }
 
-function initLevelData() {
-    // ????? ??????? ??????
-    level
+// ????? ?????? ?????????
+function createParticles() {
+    if (isGameOver) return;
+    
+    // ?????? ??????? ??? ?????
+    const particle = document.createElement('div');
+    particle.className = 'particle';
+    
+    // ???? ??????
+    const posX = Math.random() * gameContainer.offsetWidth;
+    
+    particle.style.left = posX + 'px';
+    particle.style.bottom = '70px';
+    
+    // ????? ?????? ??? DOM
+    particles.appendChild(particle);
+    
+    // ???? ??????
+    let opacity = 0.7;
+    let posY = 0;
+    let speed = Math.random() * 2 + 1;
+    
+    const animateParticle = () => {
+        opacity -= 0.01;
+        posY += speed;
+        
+        particle.style.opacity = opacity;
+        particle.style.bottom = (70 + posY) + 'px';
+        
+        if (opacity > 0) {
+            requestAnimationFrame(animateParticle);
+        } else {
+            particle.remove();
+        }
+    };
+    
+    requestAnimationFrame(animateParticle);
+}
+
+// ????? ?????? ?????
+function createJumpParticles() {
+    for (let i = 0; i < 10; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        
+        const dinoRect = dino.getBoundingClientRect();
+        const containerRect = gameContainer.getBoundingClientRect();
+        
+        // ???? ?????? ??? ?????????
+        const posX = dinoRect.left - containerRect.left + Math.random() * dinoRect.width;
+        
+        particle.style.left = posX + 'px';
+        particle.style.bottom = '70px';
+        
+        // ????? ?????? ??? DOM
+        particles.appendChild(particle);
+        
+        // ???? ??????
+        let opacity = 0.7;
+        let posY = 0;
+        let speedX = (Math.random() - 0.5) * 5;
+        let speedY = Math.random() * 3 + 2;
+        
+        const animateParticle = () => {
+            opacity -= 0.02;
+            posY += speedY;
+            speedY -= 0.1;
+            
+            particle.style.opacity = opacity;
+            particle.style.bottom = (70 + posY) + 'px';
+            particle.style.left = (parseFloat(particle.style.left) + speedX) + 'px';
+            
+            if (opacity > 0 && posY > 0) {
+                requestAnimationFrame(animateParticle);
+            } else {
+                particle.remove();
+            }
+        };
+        
+        requestAnimationFrame(animateParticle);
+    }
+}
+
+// ????? ?????? ???????
+function createScoreParticles() {
+    const scoreRect = scoreDisplay.getBoundingClientRect();
+    const containerRect = gameContainer.getBoundingClientRect();
+    
+    for (let i = 0; i < 20; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        
+        // ???? ?????? ??? ???????
+        const posX = scoreRect.left - containerRect.left + scoreRect.width / 2 + (Math.random() - 0.5) * 50;
+        const posY = scoreRect.top - containerRect.top + scoreRect.height / 2 + (Math.random() - 0.5) * 30;
+        
+        particle.style.left = posX + 'px';
+        particle.style.top = posY + 'px';
+        particle.style.background = `hsl(${Math.random() * 360}, 100%, 70%)`;
+        
+        // ????? ?????? ??? DOM
+        particles.appendChild(particle);
+        
+        // ???? ??????
+        let opacity = 1;
+        let scale = 1;
+        let speedX = (Math.random() - 0.5) * 6;
+        let speedY = (Math.random() - 0.5) * 6;
+        
+        const animateParticle = () => {
+            opacity -= 0.02;
+            scale += 0.02;
+            
+            particle.style.opacity = opacity;
+            particle.style.transform = `scale(${scale})`;
+            particle.style.left = (parseFloat(particle.style.left) + speedX) + 'px';
+            particle.style.top = (parseFloat(particle.style.top) + speedY) + 'px';
+            
+            if (opacity > 0) {
+                requestAnimationFrame(animateParticle);
+            } else {
+                particle.remove();
+            }
+        };
+        
+        requestAnimationFrame(animateParticle);
+    }
+}
