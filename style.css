@@ -1,4 +1,4 @@
-/* ??????? ???? */
+/* إعدادات عامة */
 * {
     margin: 0;
     padding: 0;
@@ -18,7 +18,7 @@ body {
     touch-action: none;
 }
 
-/* ????? ?????? */
+/* حاوية اللعبة */
 #game-container {
     position: relative;
     width: 100%;
@@ -29,7 +29,7 @@ body {
     overflow: hidden;
 }
 
-/* ?????? ?????? */
+/* خلفيات اللعبة */
 #sky-bg {
     position: absolute;
     width: 100%;
@@ -83,7 +83,7 @@ body {
     animation: groundDetailMove 5s infinite linear;
 }
 
-/* ????? ????????? */
+/* شخصية الديناصور */
 #dino {
     position: absolute;
     bottom: 70px;
@@ -116,7 +116,7 @@ body {
     animation: hit 0.5s;
 }
 
-/* ??????? */
+/* العوائق */
 .cactus {
     position: absolute;
     bottom: 70px;
@@ -139,7 +139,7 @@ body {
     animation: fly 0.5s infinite alternate;
 }
 
-/* ?????? ??????? */
+/* جزيئات التأثير */
 .particle {
     position: absolute;
     width: 5px;
@@ -149,7 +149,7 @@ body {
     z-index: 4;
 }
 
-/* ??????? ?????????? */
+/* النتيجة والمعلومات */
 #score-container {
     position: absolute;
     top: 20px;
@@ -172,7 +172,7 @@ body {
     opacity: 0.8;
 }
 
-/* ????? ?????? ??????? */
+/* أزرار الهاتف المحمول */
 #mobile-controls {
     position: absolute;
     bottom: 10px;
@@ -202,7 +202,7 @@ body {
     background-color: rgba(255, 255, 255, 0.5);
 }
 
-/* ????? ?????? ?????? */
+/* قائمة انتهاء اللعبة */
 #game-over {
     position: fixed;
     top: 0;
@@ -253,7 +253,7 @@ body {
     background-color: #3e8e41;
 }
 
-/* ?????? ???????? */
+/* الرسوم المتحركة */
 @keyframes jump {
     0%, 100% { bottom: 70px; }
     50% { bottom: 150px; }
@@ -295,7 +295,7 @@ body {
     to { background-position: -100px 0; }
 }
 
-/* ????? ?????? ??????? */
+/* تخصيص الهاتف المحمول */
 @media (max-width: 768px) {
     #game-container {
         height: 200px;
@@ -342,7 +342,7 @@ body {
     }
 }
 
-/* ???? ?????? ??????? */
+/* رسوم متحركة للبداية */
 .intro-animation {
     animation: scaleIn 0.5s forwards;
 }
@@ -350,4 +350,4 @@ body {
 @keyframes scaleIn {
     0% { transform: scale(0.8); opacity: 0; }
     100% { transform: scale(1); opacity: 1; }
-}
+}   
