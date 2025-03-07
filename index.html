@@ -3,47 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Redzix</title>
+    <title>لعبة الديناصور المحسنة</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="game-container">
-        <!-- ???????? -->
+        <!-- الخلفيات -->
         <div id="sky-bg"></div>
         <div id="mountains-bg"></div>
         <div id="clouds-bg"></div>
         <div id="ground-bg"></div>
         
-        <!-- ????? ????????? -->
+        <!-- شخصية الديناصور -->
         <div id="dino"></div>
         
-        <!-- ??????? -->
+        <!-- العوائق -->
         <div id="obstacles"></div>
         
-        <!-- ??????? ???????? -->
+        <!-- العناصر المتحركة -->
         <div id="particles"></div>
         
-        <!-- ??????? ?????????? -->
+        <!-- النتيجة والمعلومات -->
         <div id="score-container">
             <span id="score">0</span>
-            <span id="high-score">score: 0</span>
+            <span id="high-score">أعلى نتيجة: 0</span>
         </div>
         
-        <!-- ????? ?????? ??????? -->
+        <!-- أزرار الهاتف المحمول -->
         <div id="mobile-controls">
-            <button id="jump-btn">???</button>
-            <button id="duck-btn">sauter</button>
+            <button id="jump-btn">قفز</button>
+            <button id="duck-btn">انحناء</button>
         </div>
     </div>
     
-    <!-- ????? ?????? ?????? -->
+    <!-- قائمة انتهاء اللعبة -->
     <div id="game-over">
-        <h2>????? ??????</h2>
-        <p>???????: <span id="final-score">0</span></p>
-        <button id="restart-btn">down</button>
+        <h2>انتهت اللعبة</h2>
+        <p>النتيجة: <span id="final-score">0</span></p>
+        <button id="restart-btn">إعادة اللعب</button>
     </div>
     
-    <!-- ?????? ????? -->
+    <!-- مؤثرات صوتية -->
     <audio id="jump-sound" src="data:audio/wav;base64,UklGRl9vT19wYXJhbWV0ZXJzX2ZvcmpVTVA=" preload="auto"></audio>
     <audio id="hit-sound" src="data:audio/wav;base64,UklGRl9vT19wYXJhbWV0ZXJzX2ZvckhJVA==" preload="auto"></audio>
     <audio id="point-sound" src="data:audio/wav;base64,UklGRl9vT19wYXJhbWV0ZXJzX2ZvclBPSU5U" preload="auto"></audio>
