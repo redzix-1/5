@@ -2,52 +2,583 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>لعبة الديناصور المحسنة</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الموقع الأسطوري</title>
+    <style>
+        :root {
+            --primary-color: #6a11cb;
+            --secondary-color: #2575fc;
+            --text-color: #333;
+            --light-color: #f8f9fa;
+            --dark-color: #1a1a1a;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Cairo', 'Tajawal', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            color: var(--light-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        /* النافبار */
+        nav {
+            position: fixed;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
+        
+        .logo {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--light-color);
+            text-decoration: none;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin-right: 20px;
+        }
+        
+        .nav-links a {
+            color: var(--light-color);
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .nav-links a:hover {
+            color: var(--secondary-color);
+        }
+        
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--secondary-color);
+            transition: all 0.3s ease;
+        }
+        
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        
+        /* القسم الرئيسي */
+        header {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header-content {
+            z-index: 1;
+            text-align: center;
+            max-width: 800px;
+        }
+        
+        .header-content h1 {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 1s ease-in;
+        }
+        
+        .header-content p {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            animation: fadeIn 1.5s ease-in;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            background: var(--light-color);
+            color: var(--primary-color);
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            animation: fadeIn 2s ease-in;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+        
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            background: var(--dark-color);
+            color: var(--light-color);
+        }
+        
+        /* الخلفية المتحركة */
+        .animated-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.5;
+            animation: float 15s infinite ease-in-out;
+        }
+        
+        /* قسم الميزات */
+        .features {
+            padding: 100px 0;
+            background-color: var(--light-color);
+            color: var(--text-color);
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+            color: var(--primary-color);
+            font-size: 2.5rem;
+        }
+        
+        .features-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .feature-box {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .feature-box:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        
+        .feature-box h3 {
+            margin-bottom: 15px;
+            color: var(--dark-color);
+        }
+        
+        /* قسم المعرض */
+        .gallery {
+            padding: 100px 0;
+            background-color: #f0f0f0;
+        }
+        
+        .gallery-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            height: 300px;
+            cursor: pointer;
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: all 0.5s ease;
+        }
+        
+        .gallery-item:hover img {
+            transform: scale(1.1);
+        }
+        
+        .gallery-caption {
+            position: absolute;
+            bottom: -100%;
+            left: 0;
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+            color: white;
+            transition: all 0.5s ease;
+        }
+        
+        .gallery-item:hover .gallery-caption {
+            bottom: 0;
+        }
+        
+        /* قسم الاتصال */
+        .contact {
+            padding: 100px 0;
+            background-color: var(--dark-color);
+            color: var(--light-color);
+        }
+        
+        .contact-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 50px;
+        }
+        
+        .contact-info h3 {
+            margin-bottom: 20px;
+            color: var(--secondary-color);
+        }
+        
+        .contact-info p {
+            margin-bottom: 10px;
+        }
+        
+        .contact-form input,
+        .contact-form textarea {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--light-color);
+        }
+        
+        .contact-form input::placeholder,
+        .contact-form textarea::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        footer {
+            background-color: #000;
+            color: var(--light-color);
+            text-align: center;
+            padding: 20px 0;
+        }
+        
+        /* التحريكات */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); }
+            25% { transform: translateY(-20px) translateX(10px); }
+            50% { transform: translateY(10px) translateX(-20px); }
+            75% { transform: translateY(-15px) translateX(-10px); }
+        }
+        
+        /* التجاوب */
+        @media (max-width: 768px) {
+            .header-content h1 {
+                font-size: 3rem;
+            }
+            
+            .header-content p {
+                font-size: 1.2rem;
+            }
+            
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                height: 100vh;
+                width: 70%;
+                background-color: var(--dark-color);
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                transition: all 0.5s ease;
+            }
+            
+            .nav-links.active {
+                right: 0;
+            }
+            
+            .nav-links li {
+                margin: 20px 0;
+            }
+            
+            .menu-toggle {
+                display: block;
+                cursor: pointer;
+                z-index: 2000;
+            }
+            
+            .menu-toggle span {
+                display: block;
+                width: 30px;
+                height: 3px;
+                margin-bottom: 5px;
+                background-color: var(--light-color);
+                transition: all 0.3s ease;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div id="game-container">
-        <!-- الخلفيات -->
-        <div id="sky-bg"></div>
-        <div id="mountains-bg"></div>
-        <div id="clouds-bg"></div>
-        <div id="ground-bg"></div>
-        
-        <!-- شخصية الديناصور -->
-        <div id="dino"></div>
-        
-        <!-- العوائق -->
-        <div id="obstacles"></div>
-        
-        <!-- العناصر المتحركة -->
-        <div id="particles"></div>
-        
-        <!-- النتيجة والمعلومات -->
-        <div id="score-container">
-            <span id="score">0</span>
-            <span id="high-score">أعلى نتيجة: 0</span>
+    <!-- النافبار -->
+    <nav>
+        <div class="container nav-container">
+            <a href="#" class="logo">الموقع الأسطوري</a>
+            <ul class="nav-links">
+                <li><a href="#home">الرئيسية</a></li>
+                <li><a href="#features">الميزات</a></li>
+                <li><a href="#gallery">معرض الأعمال</a></li>
+                <li><a href="#contact">اتصل بنا</a></li>
+            </ul>
+            <div class="menu-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
         </div>
-        
-        <!-- أزرار الهاتف المحمول -->
-        <div id="mobile-controls">
-            <button id="jump-btn">قفز</button>
-            <button id="duck-btn">انحناء</button>
+    </nav>
+
+    <!-- القسم الرئيسي -->
+    <header id="home">
+        <div class="animated-bg" id="animated-bg"></div>
+        <div class="container header-content">
+            <h1>موقع إسطوري مذهل</h1>
+            <p>أهلاً بك في أكثر المواقع روعة على الإنترنت! تصميم عصري وميزات لا مثيل لها</p>
+            <a href="#features" class="btn">استكشف الميزات</a>
         </div>
-    </div>
-    
-    <!-- قائمة انتهاء اللعبة -->
-    <div id="game-over">
-        <h2>انتهت اللعبة</h2>
-        <p>النتيجة: <span id="final-score">0</span></p>
-        <button id="restart-btn">إعادة اللعب</button>
-    </div>
-    
-    <!-- مؤثرات صوتية -->
-    <audio id="jump-sound" src="data:audio/wav;base64,UklGRl9vT19wYXJhbWV0ZXJzX2ZvcmpVTVA=" preload="auto"></audio>
-    <audio id="hit-sound" src="data:audio/wav;base64,UklGRl9vT19wYXJhbWV0ZXJzX2ZvckhJVA==" preload="auto"></audio>
-    <audio id="point-sound" src="data:audio/wav;base64,UklGRl9vT19wYXJhbWV0ZXJzX2ZvclBPSU5U" preload="auto"></audio>
-    
-    <script src="script.js"></script>
+    </header>
+
+    <!-- قسم الميزات -->
+    <section class="features" id="features">
+        <div class="container">
+            <h2 class="section-title">ميزاتنا الرائعة</h2>
+            <div class="features-container">
+                <div class="feature-box">
+                    <div class="feature-icon">
+                        <img src="/api/placeholder/64/64" alt="ميزة 1" />
+                    </div>
+                    <h3>تصميم مذهل</h3>
+                    <p>تصميم عصري فريد من نوعه يجمع بين الجمال والوظائف المتطورة</p>
+                </div>
+                <div class="feature-box">
+                    <div class="feature-icon">
+                        <img src="/api/placeholder/64/64" alt="ميزة 2" />
+                    </div>
+                    <h3>سرعة فائقة</h3>
+                    <p>سرعة تحميل استثنائية وأداء مثالي على جميع الأجهزة</p>
+                </div>
+                <div class="feature-box">
+                    <div class="feature-icon">
+                        <img src="/api/placeholder/64/64" alt="ميزة 3" />
+                    </div>
+                    <h3>تجربة مستخدم مميزة</h3>
+                    <p>واجهة سهلة الاستخدام مع تجربة مستخدم مميزة وتفاعلية</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- قسم المعرض -->
+    <section class="gallery" id="gallery">
+        <div class="container">
+            <h2 class="section-title">معرض أعمالنا</h2>
+            <div class="gallery-container">
+                <div class="gallery-item">
+                    <img src="/api/placeholder/400/300" alt="صورة 1" />
+                    <div class="gallery-caption">
+                        <h3>مشروع 1</h3>
+                        <p>وصف قصير للمشروع الأول</p>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <img src="/api/placeholder/400/300" alt="صورة 2" />
+                    <div class="gallery-caption">
+                        <h3>مشروع 2</h3>
+                        <p>وصف قصير للمشروع الثاني</p>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <img src="/api/placeholder/400/300" alt="صورة 3" />
+                    <div class="gallery-caption">
+                        <h3>مشروع 3</h3>
+                        <p>وصف قصير للمشروع الثالث</p>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <img src="/api/placeholder/400/300" alt="صورة 4" />
+                    <div class="gallery-caption">
+                        <h3>مشروع 4</h3>
+                        <p>وصف قصير للمشروع الرابع</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- قسم الاتصال -->
+    <section class="contact" id="contact">
+        <div class="container">
+            <h2 class="section-title">اتصل بنا</h2>
+            <div class="contact-container">
+                <div class="contact-info">
+                    <h3>معلومات الاتصال</h3>
+                    <p><strong>العنوان:</strong> شارع الإبداع، المدينة الرقمية</p>
+                    <p><strong>الهاتف:</strong> +123 456 7890</p>
+                    <p><strong>البريد الإلكتروني:</strong> info@awesome-site.com</p>
+                </div>
+                <div class="contact-form">
+                    <h3>أرسل رسالة</h3>
+                    <form id="contactForm">
+                        <input type="text" placeholder="الاسم الكامل" required>
+                        <input type="email" placeholder="البريد الإلكتروني" required>
+                        <textarea rows="5" placeholder="الرسالة" required></textarea>
+                        <button type="submit" class="btn">إرسال الرسالة</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- الفوتر -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 الموقع الأسطوري. جميع الحقوق محفوظة.</p>
+        </div>
+    </footer>
+
+    <script>
+        // إنشاء الخلفية المتحركة
+        function createParticles() {
+            const container = document.getElementById('animated-bg');
+            const colors = ['#6a11cb', '#2575fc', '#ffffff', '#a239ca'];
+            
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // خصائص عشوائية
+                const size = Math.random() * 30 + 10;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const left = Math.random() * 100;
+                const top = Math.random() * 100;
+                const delay = Math.random() * 5;
+                
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.backgroundColor = color;
+                particle.style.left = `${left}%`;
+                particle.style.top = `${top}%`;
+                particle.style.animationDelay = `${delay}s`;
+                
+                container.appendChild(particle);
+            }
+        }
+        
+        // تحريك النافبار عند السكرول
+        function handleScroll() {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 50) {
+                nav.style.backgroundColor = 'rgba(0, 0, 0, 0.95)';
+                nav.style.padding = '10px 0';
+            } else {
+                nav.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+                nav.style.padding = '20px 0';
+            }
+        }
+        
+        // تبديل القائمة المتنقلة
+        function toggleMenu() {
+            const navLinks = document.querySelector('.nav-links');
+            const menuToggle = document.querySelector('.menu-toggle');
+            
+            navLinks.classList.toggle('active');
+            menuToggle.classList.toggle('active');
+        }
+        
+        // معالجة نموذج الاتصال
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            alert('تم إرسال رسالتك بنجاح! سنتواصل معك قريباً.');
+            e.target.reset();
+        }
+        
+        // تمهيد للسكرول
+        function smoothScroll() {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 70,
+                            behavior: 'smooth'
+                        });
+                        
+                        // إغلاق القائمة في الهواتف المحمولة بعد النقر
+                        const navLinks = document.querySelector('.nav-links');
+                        if (navLinks.classList.contains('active')) {
+                            toggleMenu();
+                        }
+                    }
+                });
+            });
+        }
+        
+        // تنفيذ عند تحميل الصفحة
+        window.addEventListener('DOMContentLoaded', () => {
+            createParticles();
+            smoothScroll();
+            
+            window.addEventListener('scroll', handleScroll);
+            
+            const menuToggle = document.querySelector('.menu-toggle');
+            menuToggle.addEventListener('click', toggleMenu);
+            
+            const contactForm = document.getElementById('contactForm');
+            contactForm.addEventListener('submit', handleFormSubmit);
+        });
+    </script>
 </body>
 </html>
